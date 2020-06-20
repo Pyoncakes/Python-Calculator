@@ -21,8 +21,8 @@ class Calculator(QW.QWidget):
         self.button_3 = QW.QPushButton('3')
         self.button_4 = QW.QPushButton('4')
         self.button_5 = QW.QPushButton('5')
-        self.button_6 = QW.QPushButton('6')
         self.button_7 = QW.QPushButton('7')
+        self.button_6 = QW.QPushButton('6')
         self.button_8 = QW.QPushButton('8')
         self.button_9 = QW.QPushButton('9')
         self.button_negative = QW.QPushButton('+/-')
@@ -35,6 +35,7 @@ class Calculator(QW.QWidget):
         self.button_clear_entry = QW.QPushButton('CE')
         self.button_global_clear = QW.QPushButton('C')
         self.button_backspace = QW.QPushButton('⌫')
+
         self.button_0.clicked.connect(self.button_handler_0)
         self.button_1.clicked.connect(self.button_handler_1)
         self.button_2.clicked.connect(self.button_handler_2)
@@ -47,30 +48,25 @@ class Calculator(QW.QWidget):
         self.button_9.clicked.connect(self.button_handler_9)
 
         grid = QW.QGridLayout()
-        grid.addWidget(self.button_clear_entry, 2, 1)
-        grid.addWidget(self.button_global_clear, 2, 2)
-        grid.addWidget(self.button_backspace, 2, 3)
-        grid.addWidget(self.button_divide, 2, 4)
-        grid.addWidget(self.button_7, 3, 1)
-        grid.addWidget(self.button_8, 3, 2)
-        grid.addWidget(self.button_9, 3, 3)
-        grid.addWidget(self.button_multiply, 3, 4)
-        grid.addWidget(self.button_4, 4, 1)
-        grid.addWidget(self.button_5, 4, 2)
-        grid.addWidget(self.button_6, 4, 3)
-        grid.addWidget(self.button_minus, 4, 4)
-        grid.addWidget(self.button_1, 5, 1)
-        grid.addWidget(self.button_2, 5, 2)
-        grid.addWidget(self.button_3, 5, 3)
-        grid.addWidget(self.button_plus, 5, 4)
-        grid.addWidget(self.button_negative, 6, 1)
-        grid.addWidget(self.button_0, 6, 2)
-        grid.addWidget(self.button_decimal_point, 6, 3)
-        grid.addWidget(self.button_equal, 6, 4)
-        layout = QW.QVBoxLayout()
-        layout.addWidget(self.lcd)
-        layout.addLayout(grid)
-        self.setLayout(layout)
+        grid.setRowMinimumHeight(1, 75)
+        grid.addWidget(self.lcd, 1, 1, 1, -1)
+        self.setLayout(grid)
+
+        button_list = [
+            [self.button_clear_entry, self.button_global_clear,
+             self.button_backspace, self.button_divide],
+            [self.button_7, self.button_8, self.button_9,
+             self.button_multiply],
+            [self.button_4, self.button_5, self.button_6, self.button_minus],
+            [self.button_1, self.button_2, self.button_3, self.button_plus],
+            [self.button_negative, self.button_0,
+             self.button_decimal_point, self.button_equal]
+        ]
+
+        for row, sublist in enumerate(button_list, 2):
+            for column, button in enumerate(sublist, 1):
+                button.setFixedHeight(50)
+                grid.addWidget(button, row, column)
 
     def change_display(self, text):
         """Updates the display after button press."""
