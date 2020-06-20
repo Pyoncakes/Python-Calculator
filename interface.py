@@ -1,20 +1,20 @@
 """The program creating the main GUI acting as the interface."""
-
-# Imports
 import sys
 from PySide2 import QtWidgets as QW
 
 
-class Calculator(QW.QWidget):
+class Calculator(QW.QWidget):  # The Calculator class is a custom QT Widget
     """The calculator widget, containing the actual calculator GUI."""
 
     def __init__(self, parent=None):
         QW.QWidget.__init__(self, parent)
-        self.display = ''
+        self.display = ''  # The string that the LCD displays (0 if empty)
 
+        # The display, using LCDNumber to get a classic calculator feel
         self.lcd = QW.QLCDNumber(20)
-        self.lcd.display(0)
+        self.lcd.display(0)  # Initially sets the display to 0
 
+        # Creating all the buttons in the calculator
         self.button_0 = QW.QPushButton('0')
         self.button_1 = QW.QPushButton('1')
         self.button_2 = QW.QPushButton('2')
@@ -36,6 +36,8 @@ class Calculator(QW.QWidget):
         self.button_global_clear = QW.QPushButton('C')
         self.button_backspace = QW.QPushButton('⌫')
 
+        # Connects the buttons to their individual functions
+        # Only using numbers for now, to showcase the simple concept
         self.button_0.clicked.connect(self.button_handler_0)
         self.button_1.clicked.connect(self.button_handler_1)
         self.button_2.clicked.connect(self.button_handler_2)
@@ -47,11 +49,14 @@ class Calculator(QW.QWidget):
         self.button_8.clicked.connect(self.button_handler_8)
         self.button_9.clicked.connect(self.button_handler_9)
 
+        # Using the Grid Layout, as the calculator buttons are nicely in a grid
         grid = QW.QGridLayout()
         grid.setRowMinimumHeight(1, 75)
         grid.addWidget(self.lcd, 1, 1, 1, -1)
         self.setLayout(grid)
 
+        # A list of all the buttons, simplifying iterating through them
+        # Put into sublist based on rows, to make it clearer where buttons are
         button_list = [
             [self.button_clear_entry, self.button_global_clear,
              self.button_backspace, self.button_divide],
@@ -63,16 +68,21 @@ class Calculator(QW.QWidget):
              self.button_decimal_point, self.button_equal]
         ]
 
+        # Iterates through all the buttons
         for row, sublist in enumerate(button_list, 2):
             for column, button in enumerate(sublist, 1):
                 button.setFixedHeight(50)
+                # Puts buttons on the grid, based on positions in button_list
                 grid.addWidget(button, row, column)
 
     def change_display(self, text):
+        # Extends the lcd display, based on the number button pressed
         """Updates the display after button press."""
         self.display += text
         self.lcd.display(self.display)
 
+    # Button handlers for the number buttons
+    # Points to change_display with the button pressed as arg, extends display
     def button_handler_0(self):
         self.change_display('0')
 
@@ -104,8 +114,8 @@ class Calculator(QW.QWidget):
         self.change_display('9')
 
 
+# Initialising the calculator application with the Calculator widget
 app = QW.QApplication(sys.argv)
 calc = Calculator()
-calc.resize(500, 250)
 calc.show()
 sys.exit(app.exec_())
