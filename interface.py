@@ -112,10 +112,3 @@ class Calculator(QW.QWidget):  # The Calculator class is a custom QT Widget
 
     def button_handler_9(self):
         self.change_display('9')
-
-
-# Initialising the calculator application with the Calculator widget
-app = QW.QApplication(sys.argv)
-calc = Calculator()
-calc.show()
-sys.exit(app.exec_())
