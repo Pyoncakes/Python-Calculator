@@ -2,6 +2,7 @@
 from PySide2 import QtWidgets as QW
 from PySide2 import QtCore as QC
 from PySide2 import QtGui as QG
+from logic import calc
 
 
 class Calculator(QW.QWidget):  # The Calculator class is a custom QT Widget
@@ -9,7 +10,12 @@ class Calculator(QW.QWidget):  # The Calculator class is a custom QT Widget
 
     def __init__(self, parent=None):
         QW.QWidget.__init__(self, parent)
-        self.string = ''  # The string that is displayed (0 if empty)
+        # Dict containing memory, to be used in calculation logic
+        self.memory = {
+            'display': 0,  # Input number, displayed on the display
+            'stored': 0,  # Input number, not shown on the main display
+            'operater': None  # The operator to be used
+        }
 
         # The display and adjusting properties
         # Using QLabel, wanted to use QLCDNumber, but can't display everything
@@ -40,11 +46,6 @@ class Calculator(QW.QWidget):  # The Calculator class is a custom QT Widget
         self.button_global_clear = QW.QPushButton('C')
         self.button_backspace = QW.QPushButton('⌫')
 
-        # Using the Grid Layout, as the calculator buttons are nicely in a grid
-        grid = QW.QGridLayout()
-        grid.addWidget(self.display, 1, 1, 1, -1)
-        self.setLayout(grid)
-
         # A list of all the buttons, simplifying iterating through them
         # Put into sublist based on rows, to make it clearer where buttons are
         button_list = [
@@ -58,6 +59,11 @@ class Calculator(QW.QWidget):  # The Calculator class is a custom QT Widget
              self.button_decimal_point, self.button_equal]
         ]
 
+        # Using the Grid Layout, as the calculator buttons are nicely in a grid
+        grid = QW.QGridLayout()
+        grid.addWidget(self.display, 1, 1, 1, -1)
+        self.setLayout(grid)
+
         # Iterates through all the buttons
         for row, sublist in enumerate(button_list, 2):
             for column, button in enumerate(sublist, 1):
@@ -68,13 +74,9 @@ class Calculator(QW.QWidget):  # The Calculator class is a custom QT Widget
                 # Puts buttons on the grid, based on positions in button_list
                 grid.addWidget(button, row, column)
 
-    def change_display(self, text):
-        # Extends the display, based on the number button pressed
-        """Updates the display after button press."""
-        self.string += text
-        self.display.setText(self.string)
-
     # Initiates the functions, all the buttons triggering handler when clicked
     def button_handler(self):
+        """Processes the button click, and updates the display."""
         button = self.sender()  # Finds what button send signal (was clicked)
-        self.change_display(button.text())  # temp, adds text to display
+        self.memory = calc(button, self.memory)
+        self.display.setText(self.memory['display'])
