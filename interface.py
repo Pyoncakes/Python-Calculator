@@ -14,7 +14,7 @@ class Calculator(QW.QWidget):  # The Calculator class is a custom QT Widget
         self.memory = {
             'display': '0',  # Input number, displayed on the display
             'stored': 0.0,  # Input number, not shown on the main display
-            'operater': 0,  # The operator to be used
+            'operator': 0,  # The operator to be used
             'override': True  # Should the display string be overritten
         }
 
