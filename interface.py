@@ -79,4 +79,4 @@ class Calculator(QW.QWidget):  # The Calculator class is a custom QT Widget
         """Processes the button click, and updates the display."""
         button = self.sender()  # Finds what button send signal (was clicked)
         self.memory = calc(button, self.memory)
-        self.display.setText(self.memory['display'])
+        self.display.setNum(self.memory['display'])
