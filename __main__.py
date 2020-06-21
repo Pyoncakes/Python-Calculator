@@ -3,8 +3,14 @@ from interface import Calculator
 import sys
 from PySide2.QtWidgets import QApplication
 
-# Initialising the calculator application with the Calculator widget
-app = QApplication(sys.argv)
-calc = Calculator()
-calc.show()
-sys.exit(app.exec_())
+
+def main():
+    # Initialising the calculator application with the Calculator widget
+    app = QApplication(sys.argv)
+    calc = Calculator()
+    calc.show()
+    sys.exit(app.exec_())
+
+
+if __name__ == "__main__":
+    main()
