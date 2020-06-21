@@ -30,13 +30,42 @@ def calc(button, memory):
             memory['operator'] = 0
 
     elif button in operators.keys():
-        if not memory['operator']:
+        if not memory['operator'] or not memory['override']:
+            if memory['operator']:
+                memory['display'] = maths(memory['stored'],
+                                          float(memory['display']),
+                                          memory['operator'])
             memory['operator'] = operators[button]
             memory['stored'] = float(memory['display'])
             memory['display'] += button
             memory['override'] = True
-        elif memory['override']:
+        else:
             memory['operator'] = operators[button]
             memory['display'] = memory['display'][:-1] + button
+            memory['override'] = True
+            memory['stored'] = 0.0
+
+    elif button == '=':
+        memory['display'] = maths(memory['stored'], float(memory['display']),
+                                  memory['operator'])
+        memory['operator'] = 0
+        memory['override'] = True
+        memory['stored'] = 0.0
 
     return memory
+
+
+def maths(a, b, o):
+    if o == 1:
+        result = a + b
+    elif o == 2:
+        result = a - b
+    elif o == 3:
+        result = a * b
+    elif o == 4:
+        result = a / b
+
+    if not result % 1:
+        return str(int(result))
+    else:
+        return str(result)
