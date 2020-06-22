@@ -12,10 +12,7 @@ class Calculator(QW.QWidget):  # The Calculator class is a custom QT Widget
         QW.QWidget.__init__(self, parent)
         # Dict containing memory, to be used in calculation logic
         self.memory = {
-            'display': '0',  # Input number, displayed on the display
-            'stored': 0.0,  # Input number, not shown on the main display
-            'operator': 0,  # The operator to be used
-            'override': True  # Should the display string be overritten
+            'display': '0'
         }
 
         # The display and adjusting properties
