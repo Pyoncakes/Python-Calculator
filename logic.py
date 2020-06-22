@@ -16,7 +16,7 @@ def calc(button, memory):
             if button != '.' or '.' not in memory['display']:
                 memory['display'] += button
 
-    elif button == '⌫':
+    elif button == '⌫' and not memory['override']:
         memory['display'] = memory['display'][:-1]
         if memory['display'] in ['', '0']:
             memory['display'] = '0'
@@ -28,6 +28,12 @@ def calc(button, memory):
         if button == 'C':
             memory['stored'] = 0.0
             memory['operator'] = 0
+
+    elif button == '+/-' and not memory['override']:
+        if memory['display'][0] == '-':
+            memory['display'] = memory['display'][1:]
+        else:
+            memory['display'] = '-' + memory['display']
 
     elif button in operators.keys():
         if not memory['operator'] or not memory['override']:
