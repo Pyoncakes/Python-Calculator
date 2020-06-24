@@ -56,8 +56,12 @@ class Logic:
             return
         elif self.input_num is None:
             # When no number is typed yet
+            if self.operator is None and self.stored_num is not None:
+                # When typing a new number, after using equals on another calc
+                self.stored_num = None
             if self.button == '0':
                 # Can't have 0 at the start
+                self.display.setNum(0)  # Does reset display
                 return
             elif self.button == '.':
                 # Can't have a decimal point without anything in front
