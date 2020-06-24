@@ -1,80 +1,147 @@
 """Handles all the calculations for the calculator."""
 
 
-def calc(button, memory):
-    """Processes the information supplied by the calculator."""
-    numbers = ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9', '.']
-    operators = {'+': 1, '-': 2, '×': 3, '÷': 4}  # Number saved in memory
+class Logic:
+    """The brain of the calculator, and all functions in this class."""
 
-    if button in numbers:
-        if memory['override']:  # Typing a number in this case, will overwrite
-            memory['override'] = False
-            if button == '.':
-                memory['display'] = '0.'  # Shouldn't write '.' without the 0
+    def __init__(self, display):
+        """Initialise the Logic."""
+        self.display = display  # The display of the calculator, to be updated
+        self.input_num = None  # The number currently being typed
+        self.stored_num = None  # The other number being stored in memory
+        self.operator = None  # The operator to be used
+        self.button = None  # The button that was pressed
+
+    def button_press(self, button):
+        """Handle the button press."""
+        self.button = button.text()  # The button pressed
+        # Subdefining the buttons into different functions
+        if self.button in ['0', '1', '2', '3', '4', '5', '6', '7',
+                           '8', '9', '.']:
+            self.number_button()
+        if self.button in ['+', '-', '×', '÷']:
+            self.operator_button()
+        if self.button in ['+/-']:
+            self.operator_single_input()  # Calculates right away
+        if self.button in ['⌫', 'CE', 'C']:
+            self.clear_button()
+        if self.button == '=':
+            if None not in [self.input_num, self.stored_num, self.operator]:
+                # If any of the 3 are not defined, can't do the calculation
+                self.calculate()
+                # Displaying the newly calculated result
+                self.display.setNum(self.stored_num)
+
+    def calculate(self):
+        """Calculate with operators using 2 numbers as input."""
+        self.input_num = float_check(self.input_num)  # Convert input to number
+        # Processing the different operators
+        if self.operator == '+':
+            self.stored_num = self.stored_num + self.input_num
+        elif self.operator == '-':
+            self.stored_num = self.stored_num - self.input_num
+        elif self.operator == '×':
+            self.stored_num = self.stored_num * self.input_num
+        elif self.operator == '÷':
+            self.stored_num = self.stored_num / self.input_num
+        # Result being stored in stored_num and input_num getting cleared
+        self.stored_num = float_check(self.stored_num)
+        self.input_num = None
+        self.operator = None
+
+    def number_button(self):
+        """Pressing a number button, or a comma button."""
+        if self.button == '.' and '.' in self.input_num:
+            # Can't have multiple decimal points
+            return
+        elif self.input_num is None:
+            # When no number is typed yet
+            if self.operator is None and self.stored_num is not None:
+                # When typing a new number, after using equals on another calc
+                self.stored_num = None
+            if self.button == '0':
+                # Can't have 0 at the start
+                self.display.setNum(0)  # Does reset display
+                return
+            elif self.button == '.':
+                # Can't have a decimal point without anything in front
+                self.input_num = '0.'
             else:
-                memory['display'] = button  # Sets display to the first input
-        elif button != '.' or '.' not in memory['display']:  # No double '.'
-            memory['display'] += button  # If not overwrite, appends the input
+                # Sets the number to the typed one
+                self.input_num = self.button
+        else:
+            # Appends the button pressed to the existing number
+            self.input_num += self.button
+        # Displays the number currently being typed
+        self.display.setText(self.input_num)
 
-    elif button == '⌫' and not memory['override']:
-        memory['display'] = memory['display'][:-1]  # Removes one char
-        if memory['display'] in ['', '0']:  # Marks when nothing is left
-            memory['display'] = '0'
-            memory['override'] = True
+    def operator_button(self):
+        """Pressing an operator button, that uses two numbers."""
+        if self.input_num is None and self.stored_num is None:
+            # The opertor can't be the first thing you type
+            return
+        elif self.input_num is not None:
+            if self.stored_num is None:
+                # Moving the input number to storage, to allow new input
+                self.stored_num = float_check(self.input_num)
+                self.input_num = None
+            else:
+                # When you click an operator after putting in a full equation
+                self.calculate()  # Will calculate previous calculation first
+        # Assigns the new operator, or reassigns it when you change operator
+        self.operator = self.button
+        # Updates the display, to show both the number and the operator
+        self.display.setText(str(self.stored_num) + ' ' + self.operator)
 
-    elif button in ['CE', 'C']:
-        # Clear Entry (CE) only clears display
-        memory['display'] = '0'
-        memory['override'] = True
-        if button == 'C':
-            # Clear Global (C) also clears the stored memory
-            memory['stored'] = 0.0
-            memory['operator'] = 0
+    def operator_single_input(self):
+        """Pressing an operator button, that uses one number, giving result."""
+        def operations(num, operator):
+            # Processes the different operations
+            if operator == '+/-':
+                # Toggles between negative and positive
+                return num * -1
+        if self.input_num is not None:
+            # Runs the operation on the input number as a priority
+            # Converts to number for the functions, then back to string
+            self.input_num = float_check(self.input_num)
+            self.input_num = str(operations(self.input_num, self.button))
+            self.display.setText(self.input_num)
+        elif self.stored_num is not None and self.operator is None:
+            # If the input number isn't defined, will use stored instead
+            # Only if result of previous calc, so not if a new operator is used
+            self.stored_num = operations(self.stored_num, self.button)
+            self.display.setNum(self.stored_num)
+        # If neither is defined, won't do anything
 
-    elif button == '+/-' and not memory['override']:
-        if memory['display'][0] == '-':  # Changes to positive
-            memory['display'] = memory['display'][1:]
-        else:  # Changes to negative
-            memory['display'] = '-' + memory['display']
-
-    elif button in operators.keys():
-        if not memory['operator'] or not memory['override']:
-            if memory['operator']:  # When typing a new operation after 2nd num
-                memory['display'] = maths(memory['stored'],
-                                          float(memory['display']),
-                                          memory['operator'])  # Calculates
-            memory['operator'] = operators[button]  # Saves the operator as int
-            memory['stored'] = float(memory['display'])  # Stores displayed num
-            memory['display'] += button  # Displays the operator
-            memory['override'] = True  # Next number clears display
-        else:  # Changing the operation
-            memory['operator'] = operators[button]  # Updates stored operator
-            memory['display'] = memory['display'][:-1] + button  # Change disp.
-
-    elif button == '=':
-        memory['display'] = maths(memory['stored'], float(memory['display']),
-                                  memory['operator'])  # Calculates
-        # Clearing memory
-        memory['operator'] = 0
-        memory['override'] = True
-        memory['stored'] = 0.0
-
-    return memory  # Returns the modified memory back to the calculator
+    def clear_button(self):
+        """Pressing a clearing button(backspace, clear entry, global clear)."""
+        if self.button == '⌫':
+            # Backspace, delete one char
+            if self.input_num is None:
+                # Can only affect input_num
+                return
+            self.input_num = self.input_num[:-1]  # Deletes the char
+            if self.input_num in ['', '0', '-0']:
+                # Any of these are effectively having deleted the whole number
+                self.input_num = None
+                self.display.setNum(0)  # Displaying 0 (resetting)
+            else:
+                self.display.setText(self.input_num)  # Displaying the new num
+        elif self.button == 'CE':
+            # Clear entry, erases the current input number
+            self.input_num = None
+            self.display.setNum(0)  # Displaying 0 (resseting)
+        elif self.button == 'C':
+            # Clear global, erasing entire memory
+            self.input_num = None
+            self.stored_num = None
+            self.operator = None
+            self.display.setNum(0)  # Displaying 0 (resseting)
 
 
-def maths(a, b, o):
-    """Calculates operations."""
-    if o == 1:  # plus operator
-        result = a + b
-    elif o == 2:  # minus operator
-        result = a - b
-    elif o == 3:  # mulitiplication operator
-        result = a * b
-    elif o == 4:  # division operator
-        result = a / b
-
-    # Checks if string displayed, needs to be an int or float
-    if not result % 1:
-        return str(int(result))
+def float_check(n):
+    """Check if the number is a float or int, and returns the correct type."""
+    if float(n) % 1 == 0:
+        return int(n)
     else:
-        return str(result)
+        return float(n)
