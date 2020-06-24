@@ -47,6 +47,7 @@ class Logic:
         # Result being stored in stored_num and input_num getting cleared
         self.stored_num = float_check(self.stored_num)
         self.input_num = None
+        self.operator = None
 
     def number_button(self):
         """Pressing a number button, or a comma button."""
@@ -101,7 +102,7 @@ class Logic:
             self.input_num = float_check(self.input_num)
             self.input_num = str(operations(self.input_num, self.button))
             self.display.setText(self.input_num)
-        elif self.stored_num is not None and self.operation is None:
+        elif self.stored_num is not None and self.operator is None:
             # If the input number isn't defined, will use stored instead
             # Only if result of previous calc, so not if a new operator is used
             self.stored_num = operations(self.stored_num, self.button)
