@@ -1,11 +1,11 @@
-"""Creates a simple calculator with a GUI"""
+"""Creates a simple calculator with a GUI."""
 from interface import Calculator
 import sys
 from PySide2.QtWidgets import QApplication
 
 
 def main():
-    # Initialising the calculator application with the Calculator widget
+    """Initialise the calculator application with the Calculator widget."""
     app = QApplication(sys.argv)
     calc = Calculator()
     calc.show()
