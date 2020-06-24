@@ -19,7 +19,7 @@ class Calculator(QW.QWidget):  # The Calculator class is a custom QT Widget
         self.display.setFont(self.display_font)
 
         # Initialising the logic class
-        self.logic = Logic(self, self.display)  # Passing the display
+        self.logic = Logic(self.display)  # Passing the display, to be updated
 
         # Creating all the buttons in the calculator
         self.button_0 = QW.QPushButton('0')
