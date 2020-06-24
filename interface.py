@@ -9,6 +9,7 @@ class Calculator(QW.QWidget):  # The Calculator class is a custom QT Widget
     """The calculator widget, containing the actual calculator GUI."""
 
     def __init__(self, parent=None):
+        """Initialise the Calculator."""
         QW.QWidget.__init__(self, parent)
 
         # The display and adjusting properties
