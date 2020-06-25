@@ -30,7 +30,7 @@ class Logic:
                 # If any of the 3 are not defined, can't do the calculation
                 self.calculate()
                 # Displaying the newly calculated result
-                self.display.setNum(self.stored_num)
+                self.display.setText(str(self.stored_num))
 
     def calculate(self):
         """Calculate with operators using 2 numbers as input."""
@@ -58,7 +58,7 @@ class Logic:
                 self.stored_num = None
             if self.button == '0':
                 # Can't have 0 at the start
-                self.display.setNum(0)  # Does reset display
+                self.display.setText('0')  # Does reset display
                 return
             elif self.button == '.':
                 # Can't have a decimal point without anything in front
@@ -110,7 +110,7 @@ class Logic:
             # If the input number isn't defined, will use stored instead
             # Only if result of previous calc, so not if a new operator is used
             self.stored_num = operations(self.stored_num, self.button)
-            self.display.setNum(self.stored_num)
+            self.display.setText(str(self.stored_num))
         # If neither is defined, won't do anything
 
     def clear_button(self):
@@ -124,19 +124,19 @@ class Logic:
             if self.input_num in ['', '0', '-0']:
                 # Any of these are effectively having deleted the whole number
                 self.input_num = None
-                self.display.setNum(0)  # Displaying 0 (resetting)
+                self.display.setText('0')  # Displaying 0 (resetting)
             else:
                 self.display.setText(self.input_num)  # Displaying the new num
         elif self.button == 'CE':
             # Clear entry, erases the current input number
             self.input_num = None
-            self.display.setNum(0)  # Displaying 0 (resseting)
+            self.display.setText('0')  # Displaying 0 (resseting)
         elif self.button == 'C':
             # Clear global, erasing entire memory
             self.input_num = None
             self.stored_num = None
             self.operator = None
-            self.display.setNum(0)  # Displaying 0 (resseting)
+            self.display.setText('0')  # Displaying 0 (resseting)
 
 
 def float_check(n):
