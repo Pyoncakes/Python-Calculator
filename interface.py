@@ -15,9 +15,12 @@ class Calculator(QW.QWidget):  # The Calculator class is a custom QT Widget
         # The display and adjusting properties
         # Using QLabel, wanted to use QLCDNumber, but can't display everything
         self.display = QW.QLabel('0')  # Initially setting the display to 0
-        self.display.setAlignment(QC.Qt.AlignRight)  # Aligns right, standard
-        self.display_font = QG.QFont("Arial", 40)
+        # Aligns in the middle, from right to left, to fit standard
+        self.display.setAlignment(QC.Qt.AlignRight | QC.Qt.AlignVCenter)
+        self.display_font = QG.QFont("Arial", 32)  # Sets the text
         self.display.setFont(self.display_font)
+        self.display.setMinimumSize(475, 75)  # Sets the display size
+        self.display.setWordWrap(True)  # Prevents extending the display
 
         # Initialising the logic class
         self.logic = Logic(self.display)  # Passing the display, to be updated
@@ -64,7 +67,7 @@ class Calculator(QW.QWidget):  # The Calculator class is a custom QT Widget
         # Using the Grid Layout, as the calculator buttons are nicely in a grid
         grid = QW.QGridLayout()
         grid.addWidget(self.display, 1, 1, 1, -1)  # Adds the display
-        self.setLayout(grid)
+        self.setLayout(grid)  # Applies the layout
 
         # Iterates through all the buttons
         for row, sublist in enumerate(button_list, 2):
@@ -72,6 +75,6 @@ class Calculator(QW.QWidget):  # The Calculator class is a custom QT Widget
                 # Addding the button to the button group
                 self.group_buttons.addButton(button)
                 # Adjusting properties of the buttons
-                button.setFixedHeight(50)
+                button.setMinimumSize(100, 50)
                 # Puts buttons on the grid, based on positions in button_list
                 grid.addWidget(button, row, column)
