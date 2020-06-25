@@ -21,7 +21,7 @@ class Logic:
             self.number_button()
         if self.button in ['+', '-', '×', '÷']:
             self.operator_button()
-        if self.button in ['+/-']:
+        if self.button in ['+/-', 'x²', '√x', '1/x']:
             self.operator_single_input()  # Calculates right away
         if self.button in ['⌫', 'CE', 'C']:
             self.clear_button()
@@ -99,7 +99,17 @@ class Logic:
             # Processes the different operations
             if operator == '+/-':
                 # Toggles between negative and positive
-                return num * -1
+                result = num * -1
+            elif operator == 'x²':
+                # Squares the number
+                result = num ** 2
+            elif operator == '√x':
+                # Squareroots the number
+                result = num ** 0.5
+            elif operator == '1/x':
+                # Inverses the number (1 divided by the number)
+                result = 1 / num
+            return float_check(result)
         if self.input_num is not None:
             # Runs the operation on the input number as a priority
             # Converts to number for the functions, then back to string
