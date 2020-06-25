@@ -43,6 +43,10 @@ class Calculator(QW.QWidget):  # The Calculator class is a custom QT Widget
         self.button_minus = QW.QPushButton('-')
         self.button_multiply = QW.QPushButton('×')
         self.button_divide = QW.QPushButton('÷')
+        self.button_squared = QW.QPushButton('x²')
+        self.button_squareroot = QW.QPushButton('√x')
+        self.button_inverse = QW.QPushButton('1/x')
+        self.button_percentile = QW.QPushButton('%')
         self.button_clear_entry = QW.QPushButton('CE')
         self.button_global_clear = QW.QPushButton('C')
         self.button_delete = QW.QPushButton('⌫')
@@ -54,8 +58,10 @@ class Calculator(QW.QWidget):  # The Calculator class is a custom QT Widget
         # A list of all the buttons, simplifying iterating through them
         # Put into sublist based on rows, to make it clearer where buttons are
         button_list = [
-            [self.button_clear_entry, self.button_global_clear,
-             self.button_delete, self.button_divide],
+            [self.button_percentile, self.button_clear_entry,
+             self.button_global_clear, self.button_delete],
+            [self.button_inverse, self.button_squared, self.button_squareroot,
+             self.button_divide],
             [self.button_7, self.button_8, self.button_9,
              self.button_multiply],
             [self.button_4, self.button_5, self.button_6, self.button_minus],
