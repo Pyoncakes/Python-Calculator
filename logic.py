@@ -51,10 +51,7 @@ class Logic:
 
     def number_button(self):
         """Pressing a number button, or a comma button."""
-        if self.button == '.' and '.' in self.input_num:
-            # Can't have multiple decimal points
-            return
-        elif self.input_num is None:
+        if self.input_num is None:
             # When no number is typed yet
             if self.operator is None and self.stored_num is not None:
                 # When typing a new number, after using equals on another calc
@@ -69,6 +66,9 @@ class Logic:
             else:
                 # Sets the number to the typed one
                 self.input_num = self.button
+        elif self.button == '.' and '.' in self.input_num:
+            # Can't have multiple decimal points
+            return
         else:
             # Appends the button pressed to the existing number
             self.input_num += self.button
