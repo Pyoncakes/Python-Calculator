@@ -14,23 +14,27 @@ class Logic:
 
     def button_press(self, button):
         """Handle the button press."""
-        self.button = button.text()  # The button pressed
-        # Subdefining the buttons into different functions
-        if self.button in ['0', '1', '2', '3', '4', '5', '6', '7',
-                           '8', '9', '.']:
-            self.number_button()
-        if self.button in ['+', '-', '×', '÷']:
-            self.operator_button()
-        if self.button in ['+/-', 'x²', '√x', '1/x']:
-            self.operator_single_input()  # Calculates right away
-        if self.button in ['⌫', 'CE', 'C']:
-            self.clear_button()
-        if self.button == '=':
-            if None not in [self.input_num, self.stored_num, self.operator]:
-                # If any of the 3 are not defined, can't do the calculation
-                self.calculate()
-                # Displaying the newly calculated result
-                self.display.setText(str(self.stored_num))
+        try:
+            self.button = button.text()  # The button pressed
+            # Subdefining the buttons into different functions
+            if self.button in ['0', '1', '2', '3', '4', '5', '6', '7',
+                               '8', '9', '.']:
+                self.number_button()
+            if self.button in ['+', '-', '×', '÷']:
+                self.operator_button()
+            if self.button in ['+/-', 'x²', '√x', '1/x']:
+                self.operator_single_input()  # Calculates right away
+            if self.button == '%':
+                self.percent_button()  # Similar to single input op
+            if self.button in ['⌫', 'CE', 'C']:
+                self.clear_button()
+            if self.button == '=':
+                if None not in [self.input_num, self.stored_num,
+                                self.operator]:
+                    # If any of the 3 are not defined, can't do the calculation
+                    self.calculate()
+        except ZeroDivisionError:
+            self.display.setText('ERROR: divide by 0')
 
     def calculate(self):
         """Calculate with operators using 2 numbers as input."""
@@ -48,6 +52,8 @@ class Logic:
         self.stored_num = float_check(self.stored_num)
         self.input_num = None
         self.operator = None
+        # Displaying the newly calculated result
+        self.display.setText(str(self.stored_num))
 
     def number_button(self):
         """Pressing a number button, or a comma button."""
@@ -122,6 +128,36 @@ class Logic:
             self.stored_num = operations(self.stored_num, self.button)
             self.display.setText(str(self.stored_num))
         # If neither is defined, won't do anything
+
+    def percent_button(self):
+        """Pressing the percent button, lot's of features, calculates."""
+        if self.input_num is None:
+            if self.stored_num is not None and self.operator is None:
+                # Converts previous result to percent
+                self.stored_num = float_check(self.stored_num / 100)
+                self.display.setText(str(self.stored_num))
+            else:
+                # Any other case without input number, won't do anything
+                return
+        else:
+            # There is an input number
+            if self.operator is None:
+                # If no operator shown, will just display percent of input num
+                result = float_check(float_check(self.input_num) / 100)
+                self.input_num = str(result)
+                self.display.setText(self.input_num)
+            else:
+                # When there is an operator, does the calculation
+                percent = float_check(float_check(self.input_num) / 100)
+                if self.operator in ['+', '-']:
+                    # Adds or subtracts a percentage (inp) of the num (stored)
+                    self.input_num = str(self.stored_num * percent)
+                    self.calculate()
+                elif self.operator in ['×', '÷']:
+                    # Finds the percentage (inp) of the number (stored)
+                    # Or divides by the percentage, not sure if feature needed
+                    self.input_num = str(percent)
+                    self.calculate()
 
     def clear_button(self):
         """Pressing a clearing button(backspace, clear entry, global clear)."""
