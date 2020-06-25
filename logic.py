@@ -91,7 +91,7 @@ class Logic:
         # Assigns the new operator, or reassigns it when you change operator
         self.operator = self.button
         # Updates the display, to show both the number and the operator
-        self.display.setText(str(self.stored_num) + ' ' + self.operator)
+        self.display.setText(str(self.stored_num) + self.operator)
 
     def operator_single_input(self):
         """Pressing an operator button, that uses one number, giving result."""
