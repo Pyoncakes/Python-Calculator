@@ -172,31 +172,32 @@ class Logic:
         """Pressing a clearing button(backspace, clear entry, global clear)."""
         if self.button == '⌫':
             # Backspace, delete one char
-            if self.input_num is None:
-                # Can only affect input_num
-                return
-            self.input_num = self.input_num[:-1]  # Deletes the char
-            if self.input_num in ['', '0', '-0']:
-                # Any of these are effectively having deleted the whole number
-                self.input_num = None
-                self.display.setText('0')  # Displaying 0 (resetting)
-            else:
-                self.display.setText(self.input_num)  # Displaying the new num
+            if not self.input_num.is_zero():
+                # Can't delete nothing *shrugs*
+                if self.decimal == 0:
+                    # Deletes the decimal point instead
+                    self.decimal = None
+                    self.display.setText(str(self.input_num))
+                else:
+                    input = self.input_num.as_tuple()  # Converting to tuple
+                    # Deleting one char
+                    input = input._replace(digits=input.digits[:-1])
+                    if self.decimal is not None:
+                        # Moves the decimal point, if it exists
+                        self.decimal -= 1
+                        input = input._replace(exponent=self.decimal)
+                    # Putting the updated number back, and updates display
+                    self.input_num = dec(input).normalize()
+                    self.display.setText(str(self.input_num))
         elif self.button == 'CE':
             # Clear entry, erases the current input number
-            self.input_num = None
+            self.input_num = dec(0)
+            self.decimal = None
             self.display.setText('0')  # Displaying 0 (resseting)
         elif self.button == 'C':
             # Clear global, erasing entire memory
-            self.input_num = None
+            self.input_num = dec(0)
+            self.decimal = None
             self.stored_num = None
             self.operator = None
             self.display.setText('0')  # Displaying 0 (resseting)
-
-
-def float_check(n):
-    """Check if the number is a float or int, and returns the correct type."""
-    if float(n) % 1 == 0:
-        return int(n)
-    else:
-        return float(n)
