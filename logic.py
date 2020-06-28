@@ -63,7 +63,7 @@ class Logic:
         """Pressing a number button, appends the input number."""
         number = int(self.button)  # Number to be appended
         input = self.input_num.as_tuple()  # input_num as a named tuple
-        if self.input_num.is_zero():
+        if self.input_num.is_zero() and self.decimal is None:
             # When no number is typed yet, sets the number to the typed one
             input = input._replace(digits=(number,))
             if self.operator is None and self.stored_num is not None:
