@@ -112,33 +112,34 @@ class Logic:
 
     def operator_single_input(self):
         """Pressing an operator button, that uses one number, giving result."""
-        def operations(num, operator):
+        def calc(num, operator=self.button):
             # Processes the different operations
-            if operator == '+/-':
-                # Toggles between negative and positive
-                result = num * -1
-            elif operator == 'x²':
+            if operator == 'x²':
                 # Squares the number
                 result = num ** 2
             elif operator == '√x':
                 # Squareroots the number
-                result = num ** 0.5
+                result = num.sqrt()  # Decimal module functionality
             elif operator == '1/x':
                 # Inverses the number (1 divided by the number)
                 result = 1 / num
-            return float_check(result)
+            return result.normalize()
         if self.input_num is not None:
-            # Runs the operation on the input number as a priority
-            # Converts to number for the functions, then back to string
-            self.input_num = float_check(self.input_num)
-            self.input_num = str(operations(self.input_num, self.button))
-            self.display.setText(self.input_num)
+            if self.stored_num is None:
+                # Only input_num is defined, will put answer in stored
+                self.stored_num = calc(self.input_num, self.button)
+                # Displaying result
+                self.display.setText(str(self.stored_num))
+            else:
+                # Both are defined, will calculate first
+                self.calculate()
+                self.stored_num = calc(self.stored_num, self.button)
+                self.display.setText(str(self.stored_num))
         elif self.stored_num is not None and self.operator is None:
-            # If the input number isn't defined, will use stored instead
-            # Only if result of previous calc, so not if a new operator is used
-            self.stored_num = operations(self.stored_num, self.button)
+            # Calculates on a previous result
+            self.stored_num = calc(self.stored_num, self.button)
             self.display.setText(str(self.stored_num))
-        # If neither is defined, won't do anything
+        # Any other case, won't work (including no number defined, or mid calc)
 
     def percent_button(self):
         """Pressing the percent button, lot's of features, calculates."""
