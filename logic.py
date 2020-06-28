@@ -24,6 +24,8 @@ class Logic:
                 self.number_button()
             elif self.button == '.':
                 self.decimal_button()
+            elif self.button == '+/-':
+                self.negative_button()
             elif self.button in ['+', '-', '×', '÷']:
                 self.operator_button()
             elif self.button in ['x²', '√x', '1/x']:
@@ -86,6 +88,13 @@ class Logic:
         if self.decimal is None:
             self.decimal = 0
             self.display.setText(str(str(self.input_num) + '.'))
+
+    def negative_button(self):
+        """Pressing the negative toggle button, toggles negative/positive."""
+        input = self.input_num.as_tuple()
+        input = input._replace(sign=not input.sign)
+        self.input_num = dec(input)
+        self.display.setText(str(self.input_num))
 
     def operator_button(self):
         """Pressing an operator button, that uses two numbers."""
