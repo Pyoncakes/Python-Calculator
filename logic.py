@@ -124,7 +124,7 @@ class Logic:
                 # Inverses the number (1 divided by the number)
                 result = 1 / num
             return result.normalize()
-        if self.input_num is not None:
+        if self.input_num.is_zero():
             if self.stored_num is None:
                 # Only input_num is defined, will put answer in stored
                 self.stored_num = calc(self.input_num, self.button)
