@@ -1,4 +1,5 @@
 """Handles all the calculations for the calculator."""
+from decimal import Decimal as dec
 
 
 class Logic:
@@ -7,7 +8,8 @@ class Logic:
     def __init__(self, display):
         """Initialise the Logic."""
         self.display = display  # The display of the calculator, to be updated
-        self.input_num = None  # The number currently being typed
+        self.input_num = dec(0)  # The number currently being typed
+        self.decimal = None  # nr. of decimals, None if no decimal point
         self.stored_num = None  # The other number being stored in memory
         self.operator = None  # The operator to be used
         self.button = None  # The button that was pressed
@@ -18,17 +20,21 @@ class Logic:
             self.button = button.text()  # The button pressed
             # Subdefining the buttons into different functions
             if self.button in ['0', '1', '2', '3', '4', '5', '6', '7',
-                               '8', '9', '.']:
+                               '8', '9']:
                 self.number_button()
-            if self.button in ['+', '-', '×', '÷']:
+            elif self.button == '.':
+                self.decimal_button()
+            elif self.button == '+/-':
+                self.negative_button()
+            elif self.button in ['+', '-', '×', '÷']:
                 self.operator_button()
-            if self.button in ['+/-', 'x²', '√x', '1/x']:
+            elif self.button in ['x²', '√x', '1/x']:
                 self.operator_single_input()  # Calculates right away
-            if self.button == '%':
+            elif self.button == '%':
                 self.percent_button()  # Similar to single input op
-            if self.button in ['⌫', 'CE', 'C']:
+            elif self.button in ['⌫', 'CE', 'C']:
                 self.clear_button()
-            if self.button == '=':
+            elif self.button == '=':
                 if None not in [self.input_num, self.stored_num,
                                 self.operator]:
                     # If any of the 3 are not defined, can't do the calculation
@@ -38,7 +44,6 @@ class Logic:
 
     def calculate(self):
         """Calculate with operators using 2 numbers as input."""
-        self.input_num = float_check(self.input_num)  # Convert input to number
         # Processing the different operators
         if self.operator == '+':
             self.stored_num = self.stored_num + self.input_num
@@ -49,51 +54,57 @@ class Logic:
         elif self.operator == '÷':
             self.stored_num = self.stored_num / self.input_num
         # Result being stored in stored_num and input_num getting cleared
-        self.stored_num = float_check(self.stored_num)
-        self.input_num = None
+        self.stored_num = self.stored_num.normalize()
+        self.input_num = dec(0)
         self.operator = None
         # Displaying the newly calculated result
         self.display.setText(str(self.stored_num))
 
     def number_button(self):
-        """Pressing a number button, or a comma button."""
-        if self.input_num is None:
-            # When no number is typed yet
+        """Pressing a number button, appends the input number."""
+        number = int(self.button)  # Number to be appended
+        input = self.input_num.as_tuple()  # input_num as a named tuple
+        if self.input_num.is_zero() and self.decimal is None:
+            # When no number is typed yet, sets the number to the typed one
+            input = input._replace(digits=(number,))
             if self.operator is None and self.stored_num is not None:
                 # When typing a new number, after using equals on another calc
                 self.stored_num = None
-            if self.button == '0':
-                # Can't have 0 at the start
-                self.display.setText('0')  # Does reset display
-                return
-            elif self.button == '.':
-                # Can't have a decimal point without anything in front
-                self.input_num = '0.'
-            else:
-                # Sets the number to the typed one
-                self.input_num = self.button
-        elif self.button == '.' and '.' in self.input_num:
-            # Can't have multiple decimal points
-            return
         else:
             # Appends the button pressed to the existing number
-            self.input_num += self.button
+            input = input._replace(digits=input.digits + (number,))
+            if self.decimal is not None:
+                # Moves the decimal if needed
+                self.decimal += 1
+                input = input._replace(exponent=-self.decimal)
+        # Updates the input number
+        self.input_num = dec(input)
         # Displays the number currently being typed
-        self.display.setText(self.input_num)
+        self.display.setText(str(self.input_num))
+
+    def decimal_button(self):
+        """Pressing the decimal button, converts input to decimal."""
+        if self.decimal is None:
+            self.decimal = 0
+            self.display.setText(str(str(self.input_num) + '.'))
+
+    def negative_button(self):
+        """Pressing the negative toggle button, toggles negative/positive."""
+        input = self.input_num.as_tuple()
+        input = input._replace(sign=not input.sign)
+        self.input_num = dec(input)
+        self.display.setText(str(self.input_num))
 
     def operator_button(self):
         """Pressing an operator button, that uses two numbers."""
-        if self.input_num is None and self.stored_num is None:
-            # The opertor can't be the first thing you type
-            return
-        elif self.input_num is not None:
-            if self.stored_num is None:
-                # Moving the input number to storage, to allow new input
-                self.stored_num = float_check(self.input_num)
-                self.input_num = None
-            else:
-                # When you click an operator after putting in a full equation
-                self.calculate()  # Will calculate previous calculation first
+        if self.stored_num is None:
+            # Moving the input number to storage, to allow new input
+            self.stored_num = self.input_num
+            self.input_num = dec(0)
+            self.decimal = None
+        else:
+            # When you click an operator after putting in a full equation
+            self.calculate()  # Will calculate previous calculation first
         # Assigns the new operator, or reassigns it when you change operator
         self.operator = self.button
         # Updates the display, to show both the number and the operator
@@ -101,93 +112,92 @@ class Logic:
 
     def operator_single_input(self):
         """Pressing an operator button, that uses one number, giving result."""
-        def operations(num, operator):
+        def calc(num, operator=self.button):
             # Processes the different operations
-            if operator == '+/-':
-                # Toggles between negative and positive
-                result = num * -1
-            elif operator == 'x²':
+            if operator == 'x²':
                 # Squares the number
                 result = num ** 2
             elif operator == '√x':
                 # Squareroots the number
-                result = num ** 0.5
+                result = num.sqrt()  # Decimal module functionality
             elif operator == '1/x':
                 # Inverses the number (1 divided by the number)
                 result = 1 / num
-            return float_check(result)
-        if self.input_num is not None:
-            # Runs the operation on the input number as a priority
-            # Converts to number for the functions, then back to string
-            self.input_num = float_check(self.input_num)
-            self.input_num = str(operations(self.input_num, self.button))
-            self.display.setText(self.input_num)
+            return result.normalize()
+        if self.input_num.is_zero():
+            if self.stored_num is None:
+                # Only input_num is defined, will put answer in stored
+                self.stored_num = calc(self.input_num, self.button)
+                # Displaying result
+                self.display.setText(str(self.stored_num))
+            else:
+                # Both are defined, will calculate first
+                self.calculate()
+                self.stored_num = calc(self.stored_num, self.button)
+                self.display.setText(str(self.stored_num))
         elif self.stored_num is not None and self.operator is None:
-            # If the input number isn't defined, will use stored instead
-            # Only if result of previous calc, so not if a new operator is used
-            self.stored_num = operations(self.stored_num, self.button)
+            # Calculates on a previous result
+            self.stored_num = calc(self.stored_num, self.button)
             self.display.setText(str(self.stored_num))
-        # If neither is defined, won't do anything
+        # Any other case, won't work (including no number defined, or mid calc)
 
     def percent_button(self):
         """Pressing the percent button, lot's of features, calculates."""
-        if self.input_num is None:
+        if self.input_num.is_zero():
             if self.stored_num is not None and self.operator is None:
                 # Converts previous result to percent
-                self.stored_num = float_check(self.stored_num / 100)
+                self.stored_num = self.stored_num / 100
                 self.display.setText(str(self.stored_num))
-            else:
-                # Any other case without input number, won't do anything
-                return
+            # Any other case without input number, won't do anything
         else:
             # There is an input number
             if self.operator is None:
                 # If no operator shown, will just display percent of input num
-                result = float_check(float_check(self.input_num) / 100)
-                self.input_num = str(result)
-                self.display.setText(self.input_num)
+                self.stored_num = self.input_num / 100
+                self.input_num = dec(0)
+                self.display.setText(str(self.stored_num))
             else:
                 # When there is an operator, does the calculation
-                percent = float_check(float_check(self.input_num) / 100)
                 if self.operator in ['+', '-']:
                     # Adds or subtracts a percentage (inp) of the num (stored)
-                    self.input_num = str(self.stored_num * percent)
+                    self.input_num = self.stored_num * (self.input_num / 100)
                     self.calculate()
                 elif self.operator in ['×', '÷']:
                     # Finds the percentage (inp) of the number (stored)
                     # Or divides by the percentage, not sure if feature needed
-                    self.input_num = str(percent)
+                    self.input_num = self.input_num / 100
                     self.calculate()
 
     def clear_button(self):
         """Pressing a clearing button(backspace, clear entry, global clear)."""
         if self.button == '⌫':
             # Backspace, delete one char
-            if self.input_num is None:
-                # Can only affect input_num
-                return
-            self.input_num = self.input_num[:-1]  # Deletes the char
-            if self.input_num in ['', '0', '-0']:
-                # Any of these are effectively having deleted the whole number
-                self.input_num = None
-                self.display.setText('0')  # Displaying 0 (resetting)
-            else:
-                self.display.setText(self.input_num)  # Displaying the new num
+            if not self.input_num.is_zero():
+                # Can't delete nothing *shrugs*
+                if self.decimal == 0:
+                    # Deletes the decimal point instead
+                    self.decimal = None
+                    self.display.setText(str(self.input_num))
+                else:
+                    input = self.input_num.as_tuple()  # Converting to tuple
+                    # Deleting one char
+                    input = input._replace(digits=input.digits[:-1])
+                    if self.decimal is not None:
+                        # Moves the decimal point, if it exists
+                        self.decimal -= 1
+                        input = input._replace(exponent=self.decimal)
+                    # Putting the updated number back, and updates display
+                    self.input_num = dec(input).normalize()
+                    self.display.setText(str(self.input_num))
         elif self.button == 'CE':
             # Clear entry, erases the current input number
-            self.input_num = None
+            self.input_num = dec(0)
+            self.decimal = None
             self.display.setText('0')  # Displaying 0 (resseting)
         elif self.button == 'C':
             # Clear global, erasing entire memory
-            self.input_num = None
+            self.input_num = dec(0)
+            self.decimal = None
             self.stored_num = None
             self.operator = None
             self.display.setText('0')  # Displaying 0 (resseting)
-
-
-def float_check(n):
-    """Check if the number is a float or int, and returns the correct type."""
-    if float(n) % 1 == 0:
-        return int(n)
-    else:
-        return float(n)
