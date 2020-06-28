@@ -1,4 +1,5 @@
 """Handles all the calculations for the calculator."""
+from decimal import Decimal as dec
 
 
 class Logic:
@@ -7,7 +8,8 @@ class Logic:
     def __init__(self, display):
         """Initialise the Logic."""
         self.display = display  # The display of the calculator, to be updated
-        self.input_num = None  # The number currently being typed
+        self.input_num = dec(0)  # The number currently being typed
+        self.decimal = None  # nr. of decimals, None if no decimal point
         self.stored_num = None  # The other number being stored in memory
         self.operator = None  # The operator to be used
         self.button = None  # The button that was pressed
@@ -18,17 +20,19 @@ class Logic:
             self.button = button.text()  # The button pressed
             # Subdefining the buttons into different functions
             if self.button in ['0', '1', '2', '3', '4', '5', '6', '7',
-                               '8', '9', '.']:
+                               '8', '9']:
                 self.number_button()
-            if self.button in ['+', '-', '×', '÷']:
+            elif self.button == '.':
+                self.decimal_button()
+            elif self.button in ['+', '-', '×', '÷']:
                 self.operator_button()
-            if self.button in ['+/-', 'x²', '√x', '1/x']:
+            elif self.button in ['x²', '√x', '1/x']:
                 self.operator_single_input()  # Calculates right away
-            if self.button == '%':
+            elif self.button == '%':
                 self.percent_button()  # Similar to single input op
-            if self.button in ['⌫', 'CE', 'C']:
+            elif self.button in ['⌫', 'CE', 'C']:
                 self.clear_button()
-            if self.button == '=':
+            elif self.button == '=':
                 if None not in [self.input_num, self.stored_num,
                                 self.operator]:
                     # If any of the 3 are not defined, can't do the calculation
@@ -56,30 +60,32 @@ class Logic:
         self.display.setText(str(self.stored_num))
 
     def number_button(self):
-        """Pressing a number button, or a comma button."""
-        if self.input_num is None:
-            # When no number is typed yet
+        """Pressing a number button, appends the input number."""
+        number = int(self.button)  # Number to be appended
+        input = self.input_num.as_tuple()  # input_num as a named tuple
+        if self.input_num.is_zero():
+            # When no number is typed yet, sets the number to the typed one
+            input = input._replace(digits=(number,))
             if self.operator is None and self.stored_num is not None:
                 # When typing a new number, after using equals on another calc
                 self.stored_num = None
-            if self.button == '0':
-                # Can't have 0 at the start
-                self.display.setText('0')  # Does reset display
-                return
-            elif self.button == '.':
-                # Can't have a decimal point without anything in front
-                self.input_num = '0.'
-            else:
-                # Sets the number to the typed one
-                self.input_num = self.button
-        elif self.button == '.' and '.' in self.input_num:
-            # Can't have multiple decimal points
-            return
         else:
             # Appends the button pressed to the existing number
-            self.input_num += self.button
+            input = input._replace(digits=input.digits + (number,))
+            if self.decimal is not None:
+                # Moves the decimal if needed
+                self.decimal += 1
+                input = input._replace(exponent=-self.decimal)
+        # Updates the input number
+        self.input_num = dec(input)
         # Displays the number currently being typed
-        self.display.setText(self.input_num)
+        self.display.setText(str(self.input_num))
+
+    def decimal_button(self):
+        """Pressing the decimal button, converts input to decimal."""
+        if self.decimal is None:
+            self.decimal = 0
+            self.display.setText(str(str(self.input_num) + '.'))
 
     def operator_button(self):
         """Pressing an operator button, that uses two numbers."""
