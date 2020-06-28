@@ -143,32 +143,29 @@ class Logic:
 
     def percent_button(self):
         """Pressing the percent button, lot's of features, calculates."""
-        if self.input_num is None:
+        if self.input_num.is_zero():
             if self.stored_num is not None and self.operator is None:
                 # Converts previous result to percent
-                self.stored_num = float_check(self.stored_num / 100)
+                self.stored_num = self.stored_num / 100
                 self.display.setText(str(self.stored_num))
-            else:
-                # Any other case without input number, won't do anything
-                return
+            # Any other case without input number, won't do anything
         else:
             # There is an input number
             if self.operator is None:
                 # If no operator shown, will just display percent of input num
-                result = float_check(float_check(self.input_num) / 100)
-                self.input_num = str(result)
-                self.display.setText(self.input_num)
+                self.stored_num = self.input_num / 100
+                self.input_num = dec(0)
+                self.display.setText(str(self.stored_num))
             else:
                 # When there is an operator, does the calculation
-                percent = float_check(float_check(self.input_num) / 100)
                 if self.operator in ['+', '-']:
                     # Adds or subtracts a percentage (inp) of the num (stored)
-                    self.input_num = str(self.stored_num * percent)
+                    self.input_num = self.stored_num * (self.input_num / 100)
                     self.calculate()
                 elif self.operator in ['×', '÷']:
                     # Finds the percentage (inp) of the number (stored)
                     # Or divides by the percentage, not sure if feature needed
-                    self.input_num = str(percent)
+                    self.input_num = self.input_num / 100
                     self.calculate()
 
     def clear_button(self):
