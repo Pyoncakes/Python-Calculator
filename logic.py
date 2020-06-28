@@ -54,6 +54,7 @@ class Logic:
         elif self.operator == '÷':
             self.stored_num = self.stored_num / self.input_num
         # Result being stored in stored_num and input_num getting cleared
+        self.stored_num = self.stored_num.normalize()
         self.input_num = dec(0)
         self.operator = None
         # Displaying the newly calculated result
