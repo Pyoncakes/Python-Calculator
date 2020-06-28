@@ -44,7 +44,6 @@ class Logic:
 
     def calculate(self):
         """Calculate with operators using 2 numbers as input."""
-        self.input_num = float_check(self.input_num)  # Convert input to number
         # Processing the different operators
         if self.operator == '+':
             self.stored_num = self.stored_num + self.input_num
@@ -55,8 +54,7 @@ class Logic:
         elif self.operator == '÷':
             self.stored_num = self.stored_num / self.input_num
         # Result being stored in stored_num and input_num getting cleared
-        self.stored_num = float_check(self.stored_num)
-        self.input_num = None
+        self.input_num = dec(0)
         self.operator = None
         # Displaying the newly calculated result
         self.display.setText(str(self.stored_num))
@@ -98,17 +96,14 @@ class Logic:
 
     def operator_button(self):
         """Pressing an operator button, that uses two numbers."""
-        if self.input_num is None and self.stored_num is None:
-            # The opertor can't be the first thing you type
-            return
-        elif self.input_num is not None:
-            if self.stored_num is None:
-                # Moving the input number to storage, to allow new input
-                self.stored_num = float_check(self.input_num)
-                self.input_num = None
-            else:
-                # When you click an operator after putting in a full equation
-                self.calculate()  # Will calculate previous calculation first
+        if self.stored_num is None:
+            # Moving the input number to storage, to allow new input
+            self.stored_num = self.input_num
+            self.input_num = dec(0)
+            self.decimal = None
+        else:
+            # When you click an operator after putting in a full equation
+            self.calculate()  # Will calculate previous calculation first
         # Assigns the new operator, or reassigns it when you change operator
         self.operator = self.button
         # Updates the display, to show both the number and the operator
