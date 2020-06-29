@@ -50,6 +50,10 @@ class Calculator(QW.QWidget):  # The Calculator class is a custom QT Widget
         self.button_clear_entry = QW.QPushButton('CE')
         self.button_global_clear = QW.QPushButton('C')
         self.button_delete = QW.QPushButton('⌫')
+        self.button_memory_clear = QW.QPushButton('MC')
+        self.button_memory_recall = QW.QPushButton('MR')
+        self.button_memory_add = QW.QPushButton('M+')
+        self.button_memory_subtract = QW.QPushButton('M-')
 
         # Creating a group for the buttons, and connecting them to the handler
         self.group_buttons = QW.QButtonGroup()
@@ -58,6 +62,8 @@ class Calculator(QW.QWidget):  # The Calculator class is a custom QT Widget
         # A list of all the buttons, simplifying iterating through them
         # Put into sublist based on rows, to make it clearer where buttons are
         button_list = [
+            [self.button_memory_clear, self.button_memory_recall,
+             self.button_memory_add, self.button_memory_subtract],
             [self.button_percentile, self.button_clear_entry,
              self.button_global_clear, self.button_delete],
             [self.button_inverse, self.button_squared, self.button_squareroot,

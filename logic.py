@@ -14,6 +14,7 @@ class Logic:
         self.stored_num = None  # The other number being stored in memory
         self.operator = None  # The operator to be used
         self.button = None  # The button that was pressed
+        self.memory = dec(0)
         getcontext().prec = 16
 
     def button_press(self, button):
@@ -36,6 +37,8 @@ class Logic:
                 self.percent_button()  # Similar to single input op
             elif self.button in ['⌫', 'CE', 'C']:
                 self.clear_button()
+            elif self.button in ['MC', 'MR', 'M+', 'M-']:
+                self.memory_button()
             elif self.button == '=':
                 if None not in [self.input_num, self.stored_num,
                                 self.operator]:
@@ -204,3 +207,34 @@ class Logic:
             self.stored_num = None
             self.operator = None
             self.display.setText('0')  # Displaying 0 (resseting)
+
+    def memory_button(self):
+        """Trigger any button related to the memory variable."""
+        if self.button == 'MC':
+            # Resets the memory variable
+            self.memory = dec(0)
+        elif self.button == 'MR':
+            # Prints out the memory variable
+            if self.stored_num is not None and self.operator is None:
+                # Clears stored if overwriting previous result
+                self.stored_num = None
+            # Sets input to memory, clears existing
+            self.input_num = self.memory
+            self.decimal = -self.memory.as_tuple().exponent  # Updates too ofc
+            if self.decimal == 0:  # If 0 there is no decimal, so None
+                self.decimal = None
+            self.display.setText(str(self.input_num))  # Sets the display
+        elif self.button == 'M+':
+            if self.stored_num is not None and self.operator is None:
+                # Adds previous result to the memory
+                self.memory += self.stored_num
+            else:
+                # Adds current input to the memory
+                self.memory += self.input_num
+        elif self.button == 'M-':
+            if self.stored_num is not None and self.operator is None:
+                # Subtracts previous result to the memory
+                self.memory -= self.stored_num
+            else:
+                # Subtracts current input to the memory
+                self.memory -= self.input_num
