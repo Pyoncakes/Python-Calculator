@@ -1,5 +1,6 @@
 """Handles all the calculations for the calculator."""
 from decimal import Decimal as dec
+from decimal import getcontext
 
 
 class Logic:
@@ -13,6 +14,7 @@ class Logic:
         self.stored_num = None  # The other number being stored in memory
         self.operator = None  # The operator to be used
         self.button = None  # The button that was pressed
+        getcontext().prec = 16
 
     def button_press(self, button):
         """Handle the button press."""
@@ -70,8 +72,9 @@ class Logic:
             if self.operator is None and self.stored_num is not None:
                 # When typing a new number, after using equals on another calc
                 self.stored_num = None
-        else:
+        elif len(input.digits) < 16:
             # Appends the button pressed to the existing number
+            # Caps the input to 16 digits
             input = input._replace(digits=input.digits + (number,))
             if self.decimal is not None:
                 # Moves the decimal if needed
@@ -185,9 +188,9 @@ class Logic:
                     if self.decimal is not None:
                         # Moves the decimal point, if it exists
                         self.decimal -= 1
-                        input = input._replace(exponent=self.decimal)
+                        input = input._replace(exponent=-self.decimal)
                     # Putting the updated number back, and updates display
-                    self.input_num = dec(input).normalize()
+                    self.input_num = dec(input)
                     self.display.setText(str(self.input_num))
         elif self.button == 'CE':
             # Clear entry, erases the current input number
