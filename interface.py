@@ -19,7 +19,7 @@ class Calculator(QW.QWidget):  # The Calculator class is a custom QT Widget
         self.display.setAlignment(QC.Qt.AlignRight | QC.Qt.AlignVCenter)
         self.display_font = QG.QFont("Arial", 32)  # Sets the text
         self.display.setFont(self.display_font)
-        self.display.setMinimumSize(475, 75)  # Sets the display size
+        self.display.setMinimumSize(620, 50)  # Sets the display size
         self.display.setWordWrap(True)  # Prevents extending the display
 
         # Initialising the logic class
