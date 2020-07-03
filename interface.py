@@ -17,9 +17,9 @@ class Calculator(QW.QWidget):  # The Calculator class is a custom QT Widget
         self.display = QW.QLabel('0')  # Initially setting the display to 0
         # Aligns in the middle, from right to left, to fit standard
         self.display.setAlignment(QC.Qt.AlignRight | QC.Qt.AlignVCenter)
-        self.display_font = QG.QFont("Arial", 32)  # Sets the text
+        self.display_font = QG.QFont("Arial", 36)  # Sets the text
         self.display.setFont(self.display_font)
-        self.display.setMinimumSize(620, 50)  # Sets the display size
+        self.display.setMinimumSize(700, 100)  # Sets the display size
         self.display.setWordWrap(True)  # Prevents extending the display
 
         # Initialising the logic class
@@ -84,9 +84,9 @@ class Calculator(QW.QWidget):  # The Calculator class is a custom QT Widget
         # Iterates through all the buttons
         for row, sublist in enumerate(button_list, 2):
             for column, button in enumerate(sublist, 1):
-                # Addding the button to the button group
+                # Addding the button to the main button group
                 self.group_buttons.addButton(button)
                 # Adjusting properties of the buttons
-                button.setMinimumSize(100, 50)
+                button.setMinimumSize(100, 80)
                 # Puts buttons on the grid, based on positions in button_list
                 grid.addWidget(button, row, column)

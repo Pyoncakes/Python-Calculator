@@ -148,7 +148,7 @@ class Logic:
         # Any other case, won't work (including no number defined, or mid calc)
 
     def percent_button(self):
-        """Pressing the percent button, lot's of features, calculates."""
+        """Pressing the percent button, lots of features, calculates."""
         if self.input_num.is_zero():
             if self.stored_num is not None and self.operator is None:
                 # Converts previous result to percent
