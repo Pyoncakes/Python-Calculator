@@ -9,6 +9,7 @@ def main():
     app = QApplication(sys.argv)
     calc = Calculator()
     calc.show()
+    calc.setFixedSize(calc.size())
     sys.exit(app.exec_())
 
 
